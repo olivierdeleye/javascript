@@ -15,6 +15,41 @@ div.vb {
 }
 -->
 </style>
+<script>
+  window.onload = function(){
+    //=============variabelen=======
+  var eOutput = document.getElementById('output');
+  var eKnop = document.getElementById('deKnop');
+  var eGetal = document.getElementById('getal');
+  //=============event handlers===========
+  eKnop.onclick = function(){
+        var nGetal = eGetal.value;
+        eOutput.innerHTML = berekenFaculteit(parseInt(nGetal));  
+  };
+  function berekenFaculteit(n){
+      var sResultaat = "Faculteit van " + n + " is: ";
+      if( n === "" || isNaN(n)){
+          alert("Is geen getal");
+      }
+      if(n < 0){
+          alert("Faculteit van negatief getal bestaat niet");
+      }
+      else{
+        if(n === 0){
+          return sResultaat += 1;
+        }
+        else{
+          var nProduct = 1;
+          for(var i = 1; i <= n; i++){
+             nProduct*=i;
+          }
+          return sResultaat + nProduct;
+        }
+      }
+     console.log(n);
+  }
+  };
+</script>
 </head>
 
 <body>

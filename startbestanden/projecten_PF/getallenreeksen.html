@@ -15,26 +15,35 @@ output {
 <script>
   
   window.onload = function(){
-	  
-	  //=============variabelen=======
-	  
-	  var eOutput 	= document.getElementById('output'); 
-	  var eKnop 	= document.getElementById('deKnop');
-	  var eGetal	= document.getElementById('getal');
-	 
-	  //=============event handlers===========
-	  
-	  eKnop.onclick = lussenMaar;
+  //=============variabelen=======
+  var eOutput = document.getElementById('output');
+  var eKnop = document.getElementById('deKnop');
+  var eGetal = document.getElementById('getal');
+  //=============event handlers===========
+  eKnop.onclick = function(){
+        eOutput.innerHTML = arrayLus();
+    /*var nGetal = eGetal.value;
+    if(nGetal==""||isNaN(nGetal)){
+      alert(' Deze functie werkt enkel met getallen');
+    }
+    else{
+      eOutput.innerHTML = lussenMaar(parseInt(nGetal));
+    }*/
+   };
+ };//einde window.onload
+ //=============functies=================
+ function arrayLus(){
   
-  }//einde window.onload
-  
-  //=============functies=================
-  
-  function lussenMaar(){
-  /*   Testfunctie voor iteraties  */
-	  console.log(eGetal.value)
-	  
+  var sTekst = "";
+  var aGetallen = [12,2,4,8,5];
+  var i = 0;
+  while(i < aGetallen.length){
+      sTekst += aGetallen[i] + "&nbsp;";
+      i++;
   }
+  console.log(sTekst);
+ return sTekst;
+};
 </script>
 <title>JS PF project: Getallenreeksen</title>
 </head>

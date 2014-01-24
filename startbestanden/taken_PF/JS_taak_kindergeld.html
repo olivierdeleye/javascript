@@ -51,81 +51,76 @@ div.vb {
 </form> 
 <div class="vb" id="output"></div>
 <script> 
-   var eKnop   = document.querySelector('#deKnop'); 
-   eKnop.onclick = evalueer;
-   function evalueer(){ 
-  
- /* evalueert of een student geslaagd is of niet */ 
-   //console.log('fn evalueer'); 
-    // de invulvelden zijn objecten 
+  var eKnop   = document.querySelector('#deKnop'); 
+  eKnop.onclick = evalueer;
+  function evalueer(){ 
+   // de invulvelden zijn objecten 
    var eKinderen   = document.getElementById('kinderen'); 
    var eMaandloon  = document.getElementById('maandloon'); 
     
    //aantal kinderen en maandloon  
    var nKinderen     = parseInt(eKinderen.value); 
    var nMaandloon    = parseInt(eMaandloon.value); 
- 
-   var nKindergeld = 0;
-   var nTariefDrie = 0;
-   var nTariefVijf = 0;
+   var nBasis        = nKinderen * 25;
+   var nKindergeld   = 0;
+   var nTariefDrie   = 0;
+   var nTariefVijf   = 0;
      
-    // resultaat
+  // resultaat
    var sBericht = ""; 
   
    if(nKinderen == 0 || nMaandloon == 0){
       alert('ingave mag niet 0 zijn !');
    }
    else{
-       if(nMaandloon <= 500){ // toeslag 25%
-           if(nKinderen < 3){
-              nKindergeld = nKinderen * 25; 
-           }
-           if(nKinderen > 2 && nKinderen < 5){
-               nTariefDrie =  (nKinderen - 2)*12.5;
-               nKindergeld = (nKinderen * 25);
-           }
-           else{
-               nTariefDrie = (nKinderen - 2)*12.5;
-               nTariefVijf = (nKinderen - 4)*7.5;
-               nKindergeld = (nKinderen * 25) + (nTariefDrie + nTariefVijf);
-           }
-           nKindergeld = nKindergeld * 1.25;
-       }
-   }
-    if(nMaandloon > 500 && nMaandloon <= 2000){ // geen toeslag en geen vermindering
+     if(nMaandloon <= 500){ // toeslag 25%
        if(nKinderen < 3){
-              nKindergeld = nKinderen * 25; 
+          nKindergeld = nBasis; 
        }
        if(nKinderen > 2 && nKinderen < 5){
-               nTariefDrie =  (nKinderen - 2)*12.5;
-               nKindergeld = (nKinderen * 25);
-        }
-        else{
-           nTariefDrie = (nKinderen - 2)*12.5;
-           nTariefVijf = (nKinderen - 4)*7.5;
-           nKindergeld = (nKinderen * 25) + (nTariefDrie + nTariefVijf);
-        }
+          nTariefDrie =  (nKinderen - 2)*12.5;
+          nKindergeld = nBasis + nTariefDrie;
+       }
+       else{
+          nTariefDrie = (nKinderen - 2)*12.5;
+          nTariefVijf = (nKinderen - 4)*7.5;
+          nKindergeld =  nBasis + (nTariefDrie + nTariefVijf);
+       }
+       nKindergeld = nKindergeld * 1.25;
      }
-     else{ // maandloon > 2000 -45% kindergeld
-          if(nKinderen < 3){
-              nKindergeld = nKinderen * 25; 
-           }
-           if(nKinderen > 2 && nKinderen < 5){
-               nTariefDrie =  (nKinderen - 2)*12.5;
-               nKindergeld = (nKinderen * 25);
-           }
-           else{
-               nTariefDrie = (nKinderen - 2)*12.5;
-               nTariefVijf = (nKinderen - 4)*7.5;
-               nKindergeld = (nKinderen * 25) + (nTariefDrie + nTariefVijf);
-           }
-           nKindergeld = nKindergeld * 0.55;
-           if(nKindergeld <= (nKinderen * 25)){
-               nKindergeld = nKinderen *25;
-           }
+   }
+   if(nMaandloon > 2000){ // maandloon > 2000 -45% kindergeld
+     if(nKinderen < 3){
+         nKindergeld = nBasis; 
      }
-   
-   
+     if(nKinderen > 2 && nKinderen < 5){
+         nTariefDrie =  (nKinderen - 2)*12.5;
+         nKindergeld =  nBasis + nTariefDrie;
+      }
+      else{
+         nTariefDrie = (nKinderen - 2)*12.5;
+         nTariefVijf = (nKinderen - 4)*7.5;
+         nKindergeld = nBasis + (nTariefDrie + nTariefVijf);
+       }
+       nKindergeld = nKindergeld * 0.55;
+       if(nKindergeld <= nBasis){
+          nKindergeld = nBasis;
+       }
+   }
+   else{ // geen toeslag en geen vermindering
+    if(nKinderen < 3){
+        nKindergeld = nBasis; 
+    }
+    if(nKinderen > 2 && nKinderen < 5){
+        nTariefDrie =  (nKinderen - 2)*12.5;
+        nKindergeld = nBasis + nTariefDrie;
+    }
+    else{
+        nTariefDrie = (nKinderen - 2)*12.5;
+        nTariefVijf = (nKinderen - 4)*7.5;
+        nKindergeld =  nBasis + (nTariefDrie + nTariefVijf);
+     }
+   }
    sBericht = "Kindergeld: " + nKindergeld;
    //output naar div 
    var eOutput     = document.querySelector('#output'); 
