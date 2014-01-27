@@ -43,7 +43,9 @@ img{
      /* toevoegen tekst " en chocolade */
        var ePar         = document.getElementsByTagName('p')[0];
        var tItem        = ePar.childNodes[4];
-       tItem.appendData(" en chocolade\n");
+       var sTekst2      = " en chocolade\n";
+       tItem.appendData(sTekst2);
+       //tItem.innerHTML  = tItem.innerHTML + sTekst2;
           
    
     /* div element toevoegen met id 'footer' als laaste element binnen element div#containerX*/
