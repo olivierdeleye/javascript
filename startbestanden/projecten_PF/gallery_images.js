@@ -9,4 +9,4 @@ var aModernArt = [
 ["kendell_geers.jpg","Kendell Geers,  T.W. (I.N.R.I.), 1994","Kendell Geers"],
 ["julia_binfield1.jpg","Julia Binfield, Affiche Networks & system management Olivetti, 1993","Julia Binfield"]
 
-]
+];

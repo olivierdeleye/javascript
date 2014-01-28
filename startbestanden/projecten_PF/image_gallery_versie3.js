@@ -20,7 +20,7 @@ window.onload = function () {
   //var eSidebar     = document.querySelector('aside'); 
   //var eLinks     = eSidebar.getElementsByTagName('a');
   var eImg     = document.getElementById('plaatshouder'); 
-  var eLinks    = document.querySelectorAll('aside a');
+  //var eLinks    = document.querySelectorAll('aside a');
   //dynamische keuzelijst 
   var eKeuzelijst   = maakKeuzelijst(aModernArt); 
   var eSidebar    = document.querySelector('aside'); 

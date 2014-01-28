@@ -1,8 +1,7 @@
+var aFeatureList;
+ 
 window.onload = function(){
-    
-    var aFeatureList;
-    
-    //eTabel.style.border('none');
+  //eTabel.style.border('none');
     var eDiv        = document.getElementById('container');
     var sBrowser    = "Browser: "+navigator.appCodeName;
     var sVersie     = "Version: "+navigator.appVersion;
@@ -12,8 +11,12 @@ window.onload = function(){
     var eTable        = createTable(aFeatureList);
     eDiv.appendChild(eTable);
 
+};
+
+
 function createTable(a){
    var eTabel      = document.createElement('table');
+   eTabel.setAttribute('border','0px;');
    var nFeatures   = a.length;
      for(var i = 0 ; i < nFeatures; i++){
         var eRij = document.createElement('tr');
@@ -21,20 +24,19 @@ function createTable(a){
         var eData2;
         eData1 = document.createElement('td');
         eData2 = document.createElement('td');
-       if(a[i]){
-         eData1.innerHTML = eData1.innerHTML + a[i];
+       if(a[i][0]){
+         eData1.innerHTML = eData1.innerHTML + a[i][1];
          eData2.innerHTML = eData2.innerHTML + "Ja";
-         //eRij.style.backgroundColor('green');
+         eRij.setAttribute("bgcolor","#81F781");
         }
         else{
-         eData1.innerHTML = eData1.innerHTML + a[i];
+         eData1.innerHTML = eData1.innerHTML + a[i][1];
          eData2.innerHTML = eData2.innerHTML + "Nee";
-         //eRij.style.backgroundColor('red');
+         eRij.setAttribute("bgcolor","#FA5858");
         }
         eRij.appendChild(eData1);
         eRij.appendChild(eData2);
         eTabel.appendChild(eRij);
         };
       return eTabel;  
-  }
-};
+  };

@@ -63,38 +63,195 @@ button.like{
 var aFuncties	= ["instructeur","bediende","manager","arbeider"];
 //array van personen, elke persoon is een object
 var aoPersoneel = [
-	{id:4678,naam:"Roger Mary", functie:"instructeur", leeftijd: 65, sexe:"m", gehuwd:true, kinderen:[{naam:"Liesbeth", leeftijd: 26, sexe:"v"}],vrienden:24},
-	{naam:"Evelyn Van Welsenaers", leeftijd: 44, sexe:"v", gehuwd:true, kinderen:[{naam:"Patrick", leeftijd: 12, sexe:"m"},{naam:"Jonas", leeftijd: 14, sexe:"m"},], functie:"bediende",id:1025,vrienden:11},
-	{leeftijd: 27, sexe:"v", gehuwd:false,id:9007,functie:"arbeider",naam:"Heidi Vercouteren",vrienden:6}
-]
+    {id:4678,naam:"Roger Mary", functie:"instructeur", leeftijd: 65, sexe:"m", gehuwd:true, kinderen:[{naam:"Liesbeth", leeftijd: 26, sexe:"v"}],vrienden:24},
+    {naam:"Evelyn Van Welsenaers", leeftijd: 44, sexe:"v", gehuwd:true, kinderen:[{naam:"Patrick", leeftijd: 12, sexe:"m"},{naam:"Jonas", leeftijd: 14, sexe:"m"}], functie:"bediende",id:1025,vrienden:11},
+    {leeftijd: 27, sexe:"v", gehuwd:false,id:9007,functie:"arbeider",naam:"Heidi Vercouteren",vrienden:6}
+];
 
 window.onload = function(){
 
 //=======DOM REFERENTIES=======================================
 
 //knoppen
-var eToevoegen 		= document.getElementById('toevoegen');
+var eToevoegen 	    = document.getElementById('toevoegen');
 var ePersoneelsLijst= document.getElementById('personeelsLijst');
 //invulvelden, keuzelijsten, etc...
-var eNaam 			= document.getElementById('naam');
-var eFunctie 		= document.getElementById('functie');
-var eSexe 			= document.frmPersoneelslid.sexe;
-var eLeeftijd 		= document.getElementById('leeftijd');
-var eGehuwd 		= document.getElementById('gehuwd');
-var eKind1			= document.getElementById('kind1');
-var eKind2			= document.getElementById('kind2');
-var eKind3			= document.getElementById('kind3');
+var eNaam 	    = document.getElementById('naam');
+var eFunctie 	    = document.getElementById('functie');
+var eSexe 	    = document.frmPersoneelslid.sexe;
+var eLeeftijd 	    = document.getElementById('leeftijd');
+var eGehuwd 	    = document.getElementById('gehuwd');
+var eKind1	    = document.getElementById('kind1');
+var eKind2	    = document.getElementById('kind2');
+var eKind3	    = document.getElementById('kind3');
 //andere
-var eOutput			= document.getElementById('output');
-var eTeller			= document.getElementById('teller');
+var eOutput	    = document.getElementById('output');
+var eTeller	    = document.getElementById('teller');
 
 //=======KEUZELIJST OPVULLEN ===================================
-
-
-
-
+// gebruik van innerHTML , mogelijks problemen met IE 
+/*var sOpties = "<option value=''>--- kies een functie ---</option>";
+for(var i=0;i<aFuncties.length;i++){
+sOpties += "<option>"+aFuncties[i]+"</option>";
 }
+eFunctie.innerHTML = sOpties;*/
 
+// gebruik van DOM methods , veiliger 
+var eDF = document.createDocumentFragment(); // verzameling van elementen maken
+var eOption1 = document.createElement('option');
+var sValue1 = document.createTextNode("--- kies een functie ---");
+eOption1.appendChild(sValue1);
+eOption1.value = "";
+eDF.appendChild(eOption1);
+for(var i=0;i<aFuncties.length;i++){
+var eOption = document.createElement('option');
+var sValue = document.createTextNode(aFuncties[i]);
+eOption.appendChild(sValue);
+eDF.appendChild(eOption);
+}
+eFunctie.appendChild(eDF); // verzameling OPTION elementen in één keer toevoegen
+
+//=======EVENT HANDLERS=========================================
+//eventhandler toonpersoneelknop
+ePersoneelsLijst.addEventListener('click',function(){
+    eOutput.innerHTML = fnToonPersoneel2(aoPersoneel);
+});
+
+//eventhandler personeel toevoegen
+ eToevoegen.addEventListener('click',function(){
+  //formulierwaarden aflezen
+  var sNaam = eNaam.value; //String
+  var nLeeftijd = eLeeftijd.value; //String
+  var sKind1 = eKind1.value; //String
+  var sKind2 = eKind2.value; //String
+  var sKind3 = eKind3.value; //String
+  var bGehuwd = eGehuwd.checked; //Boolean
+  var sFunctie = eFunctie.value; //String
+  var sSexe = undefined; //String of undefined
+  //bepaal value sexe
+  for(var i=0;i<eSexe.length;i++){
+    if(eSexe[i].checked===true){
+       sSexe=eSexe[i].value;
+    }
+  }
+  //console.log(sNaam +":"+ nLeeftijd +" :"+ sFunctie +" :"+ sSexe +" :"+ bGehuwd +" :"+ sKind1+" :"+ sKind2+" :"+ sKind3);
+  //eenvoudige validatie
+  if(sNaam === "" || isNaN(nLeeftijd) || typeof(sSexe)==="undefined" || sFunctie==="" ){
+    //niet goed
+    console.log('validatie NOK');
+    alert('een van de verplichte velden is niet ingevuld');
+  }
+  else {
+   //ok
+   console.log('validatie OK');
+   fnPersoneelslidToevoegen(sNaam,nLeeftijd,bGehuwd,sFunctie,sSexe,[sKind1,sKind2,sKind3]);
+   //formulier reset
+   document.frmPersoneelslid.reset();
+   eNaam.focus();
+  }
+ });
+
+
+};
+
+//functie toonPersoneel in List vorm
+function fnToonPersoneel(aoData){
+/*
+return HTML String met UL lijst van properties en hun waarden van alle objecten in
+@aoData array van objecten
+*/
+var sLijst = "";
+if(aoData.length>0){
+  //overloop array van objecten
+  for(var i=0;i<aoData.length;i++){
+    sLijst += "<ul>";
+    var oPersoon = aoData[i];
+    //overloop alle eigenschappen van object
+    for(var key in oPersoon){
+      var propWaarde = oPersoon[key];
+      if (Array.isArray(propWaarde)){
+       sLijst += "<li>" + key + ":" + fnToonPersoneel(propWaarde) + "</li>";
+      }
+     else{
+       sLijst += "<li>" + key + ":" + propWaarde+ "</li>";
+     }
+    }
+    sLijst += "</ul>";
+   }
+}
+return sLijst;
+};
+
+//verbeterde functie toonPersoneel2 in BLOK voorstelling ipv List vorm
+function fnToonPersoneel2(aoData){
+/*
+return HTML String met UL lijst van properties en hun waarden van alle objecten in
+@aoData array van objecten
+*/
+var sLijst = "";
+if(aoData.length>0){
+  //overloop array van objecten
+  for(var i=0;i<aoData.length;i++){
+    sLijst += "<div class='persoon'>";
+    var oPersoon = aoData[i];
+    //overloop alle eigenschappen van object
+    for(var key in oPersoon){
+      var propWaarde = oPersoon[key];
+      if (Array.isArray(propWaarde)){
+       sLijst += "<span class='prop'>" + key + "</span><span class='val'>"+
+               fnToonPersoneel2(propWaarde)+ "</span>";
+      }
+     else{
+       sLijst += "<span class='prop'>"+ key +"</span><span class='val'>"+ propWaarde+ "</span>";
+     }
+    }
+    sLijst += "</div>";
+   }
+}
+return sLijst;
+};
+
+//functie personeel toevoegen
+function fnPersoneelslidToevoegen(naam,leeftijd,gehuwd,functie,sexe,aKindnamen){
+/*
+maakt een personeelslid object en voegt toe aan aoPersoneel
+@naam String,
+@leeftijd Number,
+@gehuwd Boolean,
+@functie String,
+@sexe String,
+@aKindnamen Array, optioneel, array van kindnamen
+*/
+ var persoon = new Object();
+ persoon.naam = naam;
+ persoon.leeftijd = leeftijd;
+ persoon.functie = functie;
+ persoon.gehuwd = gehuwd;
+ persoon.sexe = sexe;
+ persoon.vrienden = 0;
+ persoon.id = parseInt( (Math.random() * 10000) + 1);
+ var aKindNamen = aKindnamen || []; //optioneel argument opvangen
+ var aantalKinderen = aKindnamen.length;
+ if(aantalKinderen>0){
+   persoon.kinderen = []; //maak een property
+  for(var i=0;i<aantalKinderen;i++){
+    if(aKindnamen[i]!==""){
+      var kind = new Object();
+      kind.naam = aKindnamen[i];
+      persoon.kinderen.push(kind);
+    }
+  }
+ }
+ aoPersoneel.push(persoon);
+ fnUpdateTeller(1);
+};
+
+function fnUpdateTeller(n){
+    var eTeller        = document.getElementById('teller');
+    var nTeller        = parseInt(eTeller.innerHTML);
+    nTeller            = nTeller + n;
+    eTeller.innerHTML  = nTeller;
+};  
 </script>
 </head>
 	<body>
