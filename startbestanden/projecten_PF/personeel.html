@@ -190,23 +190,36 @@ return HTML String met UL lijst van properties en hun waarden van alle objecten 
 */
 var sLijst = "";
 if(aoData.length>0){
+ 
   //overloop array van objecten
   for(var i=0;i<aoData.length;i++){
-    sLijst += "<div class='persoon'>";
     var oPersoon = aoData[i];
+    sLijst += "<div class='persoon'" +  
+          " id='pers_" + oPersoon.id + "'" + 
+          " title='personeelsnummer: " + oPersoon.id + "'" + 
+          " data-vrienden='" + oPersoon.vrienden + "'" + 
+          "'>";
+   
     //overloop alle eigenschappen van object
     for(var key in oPersoon){
       var propWaarde = oPersoon[key];
-      if (Array.isArray(propWaarde)){
-       sLijst += "<span class='prop'>" + key + "</span><span class='val'>"+
+      if(key !== "id" && key !== "vrienden" ){ 
+        if (Array.isArray(propWaarde)){
+          sLijst += "<span class='prop'>" + key + "</span><span class='val'>"+
                fnToonPersoneel2(propWaarde)+ "</span>";
-      }
-     else{
-       sLijst += "<span class='prop'>"+ key +"</span><span class='val'>"+ propWaarde+ "</span>";
-     }
-    }
-    sLijst += "</div>";
-   }
+        }
+        else{ 
+          sLijst += "<span class='prop'>" + key + 
+            ":</span><span class='val'>" + 
+              propWaarde+ "</span>"; 
+        } 
+      } 
+    } 
+    if(typeof oPersoon.vrienden !== "undefined") { 
+    sLijst += "<button class='like' title='voeg een vriendje toe'>Like</button>";  
+  } 
+  sLijst += "</div>"; 
+  }
 }
 return sLijst;
 };
