@@ -105,3 +105,44 @@ naam: cookienaam
 */   
   setCookie(naam,"",-1); 
 } 
+
+function berekenen(bewerking){
+/*
+storting of geldafhaling
+@bewerking = een '+' of een '-' teken
+*/
+ var eBedrag = document.getElementById('bedrag');
+ var sBedrag = eBedrag.value;
+ var sSaldo = getCookie('saldo');
+ var sBericht = "";
+ var re = /,/;
+ sBedrag = sBedrag.replace(re,'.');
+ var nNieuwSaldo = 0;
+ if(sSaldo !== null && sSaldo !== ""){
+  if(sBedrag !== "" && !isNaN(sBedrag)){
+   nSaldo = parseFloat(sSaldo);
+   nBedrag = parseFloat(sBedrag);
+   switch (bewerking) {
+    case '+':
+    nNieuwSaldo = nSaldo + nBedrag;
+    break;
+    case '-':
+    nNieuwSaldo = nSaldo - nBedrag;
+    break;
+   }
+   setCookie('saldo',nNieuwSaldo,100);
+   window.history.go(0);
+   eBedrag.value = "";
+  }
+  else{
+   alert('U moet een correct bedrag ingeven');
+  }
+ }
+ else{
+ //geen saldo = geen rekening
+  var bOpenen = window.confirm('U heeft nog geen rekening geopend, nu even doen?');
+  if(bOpenen===true){
+     rekeningOpenen();
+  }
+ }
+};
