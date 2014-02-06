@@ -3,7 +3,9 @@ var aFeatureList;
 window.onload = function(){
   //eTabel.style.border('none');
     var eDiv        = document.getElementById('container');
-    var sBrowser    = "Browser: "+navigator.appCodeName;
+    var aUserAgent  = navigator.userAgent.toString().split('/');
+    var sUserAgent  = aUserAgent[0];
+    var sBrowser    = "Browser: "+sUserAgent;
     var sVersie     = "Version: "+navigator.appVersion;
     var ePar        = document.createElement('p');
     ePar.innerHTML  = ePar.innerHTML + sBrowser +"<br>"+sVersie;

@@ -28,8 +28,8 @@ h3 {
 }
 span.tag {
 	position:absolute;
-	top:0;
-	left:0;
+	top:0px;
+	left:0px;
 }
 -->
 </style>
@@ -46,8 +46,65 @@ var arrTags = [
 				["Access", 55, 77],
 				["Java", 278, 277],
 				["MySQL", 155, 122]
-			   ]
+			   ];
 
+ window.onload = function(){
+   var eTagContainer     = document.getElementById('tagContainer');
+   eTagContainer.appendChild(fnCreateTagCloud(arrTags));
+   
+   //test sorteren
+   /*var aaArray = fnSortArray(arrTags);
+   for(var i = 0; i < aaArray.length; i++){
+      console.log(aaArray[i][0]);
+   };*/
+      
+ };
+ 
+ function fnSortArray(aa){
+    var aTemp = [];
+    for(var nOuter = 0 ; nOuter < aa.length; nOuter++){
+        for(var nInner = 0 ; nInner < aa.length -1; nInner++){
+            if(aa[nInner][1] > aa[nInner + 1][1]){
+                aTemp         = aa[nInner +1];
+                aa[nInner +1] = aa[nInner];
+                aa[nInner]    = aTemp;
+            }
+        }
+    }
+    return aa;
+ };
+ 
+ 
+ function fnCreateTagCloud(aa){
+   var aaSortedArray  = fnSortArray(aa);
+   var eDiv     = document.createElement('div');
+   for(var i = 0; i< aaSortedArray.length; i++){
+     var eSpan   = document.createElement('span');
+     eSpan.setAttribute('class','tag');
+     var nHuidigeStemmen   =  aaSortedArray[i][1];
+     var nVorigStemmen    =  aaSortedArray[i][2];
+     var sKleur    = "";
+     var nLetterGrootte = parseInt(11 +(i * 9));
+     //stijger of daler
+     if(nHuidigeStemmen > nVorigStemmen){
+         sKleur+= "green";
+     } 
+     else{
+         sKleur+="red";
+     }
+     //positie bepalen
+     var nLeft = parseInt((Math.random()*200)+1);
+     var nTop  = parseInt((Math.random()*300)+1);
+     eSpan.style.fontSize   = nLetterGrootte+"px";
+     eSpan.style.top        = nTop+"px";
+     eSpan.style.left       = nLeft+"px";
+     eSpan.style.color = sKleur;
+    
+     eSpan.innerHTML = eSpan.innerHTML + aaSortedArray[i][0];
+     eDiv.appendChild(eSpan);
+   }
+   return eDiv;     
+ };
 </script>
 </head>
 <body>
