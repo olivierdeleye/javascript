@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Taalkeuze</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script>
+ window.onload = function(){
+
+ if(localStorage){
+   //kan deze browser dit script aan?
+   //console.log('localStorage OK');
+   if(localStorage.taalkeuze){
+   var sTaalkeuze = localStorage.taalkeuze;
+   //bericht
+  
+   }
+ }
+ };          
+</script>
+</head>
+ <body>
+  <h1>Intro</h1>
+<div id="output">
+    <div id="be">
+        <img src="../images/be.png" alt="belgische vlag" title="belgische vlag"/>&nbsp;<a href="nederlands.html">Nederlands</a>
+    </div>
+    <div id="fr">
+        <img src="../images/fr.png" alt="drapeau de la france" title="drapeau de la france"/>&nbsp;<a href="français.html">Fran&ccedil;ais</a>
+    </div>
+    <div id="gb">
+      <img src="../images/gb.png" alt="english flag" title="english flag"/>&nbsp;<a href="english.html">English</a>
+    </div>
+</div>
+ </body>
+</html>
