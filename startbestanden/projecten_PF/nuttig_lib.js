@@ -113,7 +113,7 @@ storting of geldafhaling
 */
  var eBedrag = document.getElementById('bedrag');
  var sBedrag = eBedrag.value;
- var sSaldo = getCookie('saldo');
+ var sSaldo = localStorage.getItem('saldo');
  var sBericht = "";
  var re = /,/;
  sBedrag = sBedrag.replace(re,'.');
@@ -130,9 +130,19 @@ storting of geldafhaling
     nNieuwSaldo = nSaldo - nBedrag;
     break;
    }
-   setCookie('saldo',nNieuwSaldo,100);
-   window.history.go(0);
-   eBedrag.value = "";
+  if (nNieuwSaldo<=0){
+      var nMax = nSaldo-1;
+      sBericht += "Uw saldo is onvoldoende om dit bedrag af te halen. ";
+      sBericht += "U kunt maximaal " + nMax + " Euro afhalen.";
+      eBedrag.value = nMax;
+      eBedrag.focus();
+      toonWaarschuwing(sBericht);
+   }
+   else{
+    setCookie('saldo',nNieuwSaldo,100);
+    window.history.go(0);
+    eBedrag.value = "";
+   }
   }
   else{
    alert('U moet een correct bedrag ingeven');
@@ -145,4 +155,13 @@ storting of geldafhaling
      rekeningOpenen();
   }
  }
+};
+
+function toonWaarschuwing(msg){
+ /* toont een waarschuwingstekst in divWarning
+ msg = detekst
+ */
+ var eWarning = document.querySelector('.waarschuwing');
+ eWarning.innerHTML = msg;
+ eWarning.style.display = "block";
 };
