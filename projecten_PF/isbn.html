@@ -10,8 +10,7 @@
 		background-color:#CCFFCC;
 		padding:1em;
 		}
-
-	-->
+        -->
 </style>
 <script type="text/javascript">
 
@@ -26,18 +25,38 @@ var arrISBN = ['978-90-209-7557-4','978-2-87386-537-5','0-596-00048-0','0 957921
 window.onload = function(){
 	
 	divOutput	= document.getElementById('output');
-	frm			= document.frmISBN;
+	frm	        = document.frmISBN;
 	isbnVeld 	= frm.kw; //name kw noodzakelijk voor isbndb.com
 
 	
 	//lijst testwaarden
 	var strNummers = "";
-	for(var i=0;i<arrISBN.length;i++){
+	for(var i=0 ;i <arrISBN.length ; i++){
 		strNummers += arrISBN[i] + "<br />";
 		}
 	divOutput.innerHTML = strNummers;
+        
+        //event handler voor form.submit onderscheppen 
+        frm.onsubmit = function(){ 
+          var isbn = isbnVeld.value; 
+          var geldig = isValidISBN(isbn); 
+          console.log("waarde is een geldig isbnnummer: " + geldig);  
+          return false; 
+        };
 	
-}
+};
+
+function isValidISBN(isbn){ 
+  isbn   = isbn.replace(/\s/gi,""); //verwijder alle spaties door lege string
+  isbn   = isbn.replace(/\-/gi,""); //verwijder alle koppeltekens, vervang door lege string
+  var l = isbn.length; 
+  if(l===10){ 
+    return true; 
+  } 
+  else { 
+    return false; 
+  } 
+};
 </script>
 </head>
 <body>
