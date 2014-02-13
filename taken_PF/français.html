@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+ <head>
+ <title>Français</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <script>
+   window.onload = function(){
+    var eBody = document.getElementsByTagName('body');
+    var eDiv = document.createElement('div');
+    var eLink = document.createElement('a');
+    eLink.href = "JS_taak_taalkeuze.html";
+    var tNode = document.createTextNode('Home');
+    eLink.appendChild(tNode);
+    eLink.onclick = function(e){window.localStorage.clear();};
+    eDiv.appendChild(eLink);
+    
+    var eClearStorage = document.createElement('button');
+    var sTekst = document.createTextNode('Supprimer les cookies');
+    eClearStorage.appendChild(sTekst);
+    eClearStorage.setAttribute('type','button');
+    eClearStorage.addEventListener('click', function(e){window.localStorage.clear();});
+ 
+    eBody[0].appendChild(eDiv);
+    eBody[0].appendChild(eClearStorage);
+    
+    var sTaalKeuze = localStorage.getItem('taalkeuze');
+    console.log(sTaalKeuze);
+   };
+ </script>   
+</head>
+ <body>
+     <div><h1>Ceci est en Français</h1></div>
+ </body>
+</html>
