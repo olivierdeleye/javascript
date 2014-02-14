@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE HTML>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -12,7 +12,7 @@ form {
 }
 fieldset {
 	margin-bottom:1em;
- 	border 1px solid #CCC;
+ 	border: 1px solid #CCC;
 }
 legend {
 	font-weight:bold;
@@ -39,11 +39,11 @@ input {
 	margin:5px 0;
 }
 input.text {
- 	padding 0 0 0 3px;
+ 	padding: 0 0 0 3px;
 	width: 172px;
 }
 input.number {
- 	padding 0 0 0 3px;
+ 	padding: 0 0 0 3px;
 	width: 40px;
 }
 /* fouten container */
@@ -60,7 +60,168 @@ ul.fouten li{
 
 -->
 </style>
+<script>
+ //global variable
+ var oFouten = {
+     required:{ //propertie van object oFouten
+       /* enkel verplicht voor input type="text|password" */
+        msg: "verplicht veld", //properties van object required 'msg' en 'test'
+        test: function(elem){ 
+                  return elem.value !== ""; //true or false
+               }
+     },
+     aantal:{
+        msg: "getal verwacht",
+        test: function(elem){
+               if(elem.value !== ""){ // er is wel IETS ingevuld
+                   return !isNaN(elem.value) && elem.value>0; //true, is een getal en is groter dan 0
+               }
+               else{
+                   return true;
+               }
+        }
+     },
+     datum:{
+        msg: "datum ongeldig (d/m/yyyy)",
+        test: function(elem){
+          // dd/mm/yyyy
+          var re_datum = /^([0-9]|[0,1,2][0-9]|3[0,1])\/([\d]|1[0,1,2])\/\d{4}$/;
+          if(elem.value !== ""){
+           return re_datum.test(elem.value);
+          } 
+          else {
+             return true;
+          }
+        }
+     }
+ };
+ 
+ window.onload = function (){
+ //DOM referenties
+ var eFrmVlucht = document.frmVlucht;
+ var eRetour = document.frmVlucht.optRetour;
+ var eEnkel = document.frmVlucht.optEnkel;
+ var eVolw = document.frmVlucht.volwassenen;
+ var eKind = document.frmVlucht.kinderen;
+ var ePeut = document.frmVlucht.peuters;
+ 
+ //formulier submit
+ eFrmVlucht.addEventListener('submit', function (e){
+   e.preventDefault();
+   var bValid = valideer(this);
+   console.log('formulier ' + this.name +' valideert ' + bValid);
+   if(bValid===true) this.submit();
+ });
+ 
+ //eventhandler eRetour en eEnkel
+ eRetour.addEventListener('click', function(){ //radio retour
+                                   vluchtType(this.value);
+                                   });
+ eEnkel.addEventListener('click', function(){ //radio enkel
+                                   vluchtType(this.value);
+                                 });
+};
+//================================= functions ==============================================
 
+function valideer(frm){
+  var bValid = true; //optimistisch geen fouten
+  //lus doorheen alle form elementen van het formulier
+  for(var i=0;i<frm.elements.length;i++){
+    //verwijder vorige foutboodschappen
+    hideErrors(frm.elements[i]);
+    //valideer veld
+    var bVeld = valideerVeld(frm.elements[i]);
+    console.log("het element %s met name %s valideert %s",frm.elements[i].nodeName,frm.elements[i].name, bVeld);
+    if(bVeld ===false){ bValid = false; }
+   }
+   return bValid;
+};
+
+//funtion valideer veld
+function valideerVeld(elem){
+ //valideert één veld volgens zijn class
+ var aFoutBoodschappen = [];
+ for (var fout in oFouten){
+   var re = new RegExp("(^|\\s)" + fout + "(\\s|$)"); //regex
+   // fouten class aanwezig?
+   if(re.test(elem.className)){
+     var bTest = oFouten[fout].test(elem);  //oFouten['required'].test function(elem)
+     console.log("het element %s met name %s wordt gevalideerd voor %s: %s", elem.nodeName,elem.name, fout, bTest);
+     if(bTest === false){
+      aFoutBoodschappen.push(oFouten[fout].msg); //voeg fout toe aan array
+    }
+   }
+ }
+ if(aFoutBoodschappen.length>0){
+   showErrors(elem, aFoutBoodschappen);
+  }
+  return !(aFoutBoodschappen.length>0); //true indien geen fouten
+};
+
+//function show errors
+function showErrors(elem, aErrors){
+ /*
+toont alle fouten voor één element
+@elem element, te valideren veld
+@aErrors array, fouten voor dit element
+*/
+ var eBroertje = elem.nextSibling;
+ if(!eBroertje || !(eBroertje.nodeName === "UL" && eBroertje.className === "fouten")){
+    eBroertje = document.createElement('ul');
+    eBroertje.className = "fouten";
+    elem.parentNode.insertBefore(eBroertje, elem.nextSibling);
+ } 
+ //plaats alle foutberichten erin
+ for(var i=0;i<aErrors.length;i++){
+  var eLi = document.createElement('li');
+  eLi.innerHTML = aErrors[i];
+  eBroertje.appendChild(eLi);
+ }
+};
+
+//function hide errors
+function hideErrors(elem){
+/*
+verwijdert alle fouten voor één element
+@elem element, te valideren veld
+*/
+ var eBroertje = elem.nextSibling;
+ if(eBroertje && eBroertje.nodeName === "UL" && eBroertje.className === "fouten" ){
+    elem.parentNode.removeChild(eBroertje);
+ }
+};
+
+//function vluchtType
+function vluchtType(sType){
+/*
+des-/activeert de retourdatum
+@sType String, 'enkel'|'retour' radiobutton waarde
+*/
+ var eRetourDatum = document.getElementById('retourdatum');
+ var eLabelRetourdatum = document.getElementById('labelRetourdatum');
+  if(sType === "enkel"){
+   //geen retourdatum
+   var sClass = eRetourDatum.className.replace("required","");
+   eRetourDatum.className = sClass;
+   eRetourDatum.disabled = true;
+   eRetourDatum.style.display = "none";//verberg label
+   eLabelRetourdatum.style.display = "none";//verberg label
+  }
+  else{
+    eRetourDatum.disabled = false;
+    var sClass = eRetourDatum.className + " required";
+    eRetourDatum.className = sClass;
+    eRetourDatum.style.display = "inline";
+    eLabelRetourdatum.style.display = "inline";
+  }
+};
+ 
+
+
+
+
+
+</script>
 </head>
 <body>
 <h1>JS PF project: een formulier valideren</h1>
@@ -70,10 +231,10 @@ ul.fouten li{
   <fieldset id="logingegevens">
     <legend>Login gegevens</legend>
     <label for="username">Gebruikersnaam:</label>
-    <input type="text" name="username" id="username" class="text" title="uw gebruikersnaam (emailadres)" />
+    <input type="text" name="username" id="username" class="text required" title="uw gebruikersnaam (emailadres)" />
     <br />
     <label for="wachtwoord">Wachtwoord:</label>
-    <input type="password" name="wachtwoord" id="wachtwoord" class="text" title="uw wachtwoord" />
+    <input type="password" name="wachtwoord" id="wachtwoord" class="text required" title="uw wachtwoord" />
      <br />
     <label for="onthouLogin">Onthou login?</label>
     <input type="checkbox" name="onthouLogin" id="onthouLogin" title="Onthou login settings" />
@@ -86,7 +247,7 @@ ul.fouten li{
     <input name="optVluchtType" type="radio" id="optEnkel" value="enkel" />
     <br />
     <label for="vertrekL">van:</label>
-    <select name="vertrekL" id="vertrekL"  title="kies de luchthaven van waaruit u vertrekt"  class="">
+    <select name="vertrekL" id="vertrekL"  title="kies de luchthaven van waaruit u vertrekt"  class="required">
       <option value="" selected="selected">Kies vertrek luchthaven</option>
       <option value="aAAR">Aarhus (AAR) </option>
       <option value="aABZ">Aberdeen (ABZ) </option>
@@ -218,10 +379,10 @@ ul.fouten li{
     </select>
     <br />
     <label  for="vertrekdatum">datum vertrek:</label>
-    <input type="text" name="vertrekdatum" id="vertrekdatum" size="10"  title="de vertrekdatum (dd/mm/yyyy)"  class="text" />
+    <input type="text" name="vertrekdatum" id="vertrekdatum" size="10"  title="de vertrekdatum (dd/mm/yyyy)"  class="text datum required" />
     <br />
     <label for="aankomstL">naar:</label>
-    <select name="aankomstL" id="aankomstL" title="kies de luchthaven waar naartoe u vliegt" class="">
+    <select name="aankomstL" id="aankomstL" title="kies de luchthaven waar naartoe u vliegt" class="required">
       <option value="" selected="selected">Kies aankomst luchthaven</option>
       <option value="aAAR">Aarhus (AAR) </option>
       <option value="aABZ">Aberdeen (ABZ) </option>
@@ -353,18 +514,18 @@ ul.fouten li{
     </select>
     <br />
     <label for="retourdatum" id="labelRetourdatum">datum retour:</label>
-    <input type="text" name="retourdatum" id="retourdatum" size="10"  title="de datum van terugkeer (dd/mm/yyyy)" class="text" />
+    <input type="text" name="retourdatum" id="retourdatum" size="10"  title="de datum van terugkeer (dd/mm/yyyy)" class="text datum required" />
   </fieldset>
   <fieldset id="passagiers">
     <legend>Passagiers</legend>
     <label for="volwassenen">Volwassenen:</label>
-    <input type="text" name="volwassenen" id="volwassenen" title="vul het aantal volwassenen in"  class="number" />
+    <input type="text" name="volwassenen" id="volwassenen" title="vul het aantal volwassenen in"  class="number aantal required" />
     <br />
     <label for="kinderen">Kinderen:</label>
-    <input type="text" name="kinderen" id="kinderen" title="vul het aantal kinderen in"  class="number" />
+    <input type="text" name="kinderen" id="kinderen" title="vul het aantal kinderen in"  class="number aantal" />
     <br />
     <label for="peuters">Peuters:</label>
-    <input type="text" name="peuters" id="peuters" title="vul het aantal peuters in"  class="number" />
+    <input type="text" name="peuters" id="peuters" title="vul het aantal peuters in"  class="number aantal" />
     <br />
     <label for="passagier1">Passagier 1:</label>
     <input type="text" name="passagier1" id="passagier1" title="voornaam en famlilienaam van de passagier"  class="text" />

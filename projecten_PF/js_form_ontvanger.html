@@ -1,39 +1,37 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML>
 
 <html>
 <head>
-	<title>Gegeven doorgeven van ��n pagina naar een ander</title>
+    <title>Gegeven doorgeven van &eacute;&eacute;n pagina naar een ander</title>
 
 
 <style media="screen" type="text/css">
-	<!-- 
+	
 	
 	div.vb{
 		background-color:#CCFFCC;
 		padding:1em;
 		}
-	td{padding:0}
-	-->
+	td{padding:0;
+        }
 </style>
 <script>
-<!--
 window.onload = function(){
 	
 	schrijfParen();
-	
-	}
+};
 //****************
 function getQueryString(){
 // leest de querystring
 	return  unescape(location.search.substring(1));
-}
+};
 
 
 function getGET(){
 	var paren="";
 	// Decodeer functie
 	// knip de searchstring net voorbij het vraagteken af
-	var strGet= getQueryString()
+	var strGet= getQueryString();
 	// als er een searchstring is
 	if (strGet) {
 	
@@ -48,20 +46,19 @@ function getGET(){
 			}
 	}
 return paren;
-}
+};
 //****************
 function schrijfParen(){
 	
 	var container = document.getElementById('vb_paren');
 	container.innerHTML = getGET();
-}
+};
 
--->
 </script>
 </head>
 <body>
 <h1>Universele ontvanger van gegevens</h1>
-<p>Dit JS script schrijft alllllle <em>naam=waarde</em> paren van eender welk form op de pagina</p>
+<p>Dit JS script schrijft alle <em>naam=waarde</em> paren van eender welk form op de pagina</p>
 <p>Gebruik een GET als method, met javascript heb je geen toegang tot POST variabelen</p>
 
 <div class="vb" id="vb_paren"></div>

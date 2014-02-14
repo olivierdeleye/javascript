@@ -85,6 +85,37 @@ function isValidISBN(isbn){
         return false;
     }
   } 
+  if(l===13){
+    var basis12 = isbn.substr(0,12);
+    var control = isbn.substr(12);
+    if(!isNaN(basis12)){ // basisgetal is numeriek
+      control = control.replace("X","10","gi"); //controlegetal indien X vervangen door 10
+      control = parseInt(control);
+      if(!isNaN(control)){ // controlegetal(laatste getal) is nummer
+        var sumPosities = 0;
+        var sumOnpaar = 0;
+        var sumPaar = 0;
+        for(var i=0;i<basis12.length;i++){
+          if(i%2===0){
+            sumOnpaar+= parseInt(basis12.charAt(i));
+          }
+          else{
+            sumPaar+= parseInt(basis12.charAt(i)*3);
+          }
+        }
+         sumPosities += sumOnpaar + sumPaar;
+         var modulo = (10 - (sumPosities%10))%10;
+         return (control === modulo);
+       }
+       else{
+           return false;
+       }
+    }
+    else{
+        return false;
+    }
+  }
+  // niet 10 niet 13 - ongeldig nummer
   else { 
     return false; 
   } 
