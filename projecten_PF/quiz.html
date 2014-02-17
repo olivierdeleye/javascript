@@ -72,6 +72,107 @@ p.score {
 	color: #FF0051;
 }
 </style>
+<script src="../js/json2.js"></script>
+<script src="quiz.json" type="text/javascript"></script>
+<script>
+//====================================== GLOBALS ETC ==========================================
+
+//Date augmentation voor method getWeek
+Date.prototype.getWeek = function(){
+    var onejan = new Date(this.getFullYear(),0,1);
+    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay()+1)/7);
+//afronden naar boven 28-02-28 - 2012-01-01 in Ms / aantal dagen + 
+};
+
+var oQuiz     = {};
+
+window.onload = function(){
+ 
+ oQuiz = JSON.parse(jsonQuiz);
+ console.log(oQuiz.vragen[0].vraag);
+ 
+ var eQuiz = document.getElementById("quiz");
+ eQuiz.appendChild(maakDfQuiz());
+}; 
+
+function maakDfQuiz(){
+ //return documentFragment voor quiz
+ //quiz structuur: DIV met IMG's en UL
+ var dfQuiz = document.createDocumentFragment();
+ var aVragen = oQuiz.vragen;
+ var nVragen = aVragen.length;
+ //Titel
+ var dDatum = new Date(oQuiz.datum);
+ var sTitel = "Quiz van week " + dDatum.getWeek(); //augmentation method
+ var eTitel = document.createElement('h2');
+ eTitel.appendChild(document.createTextNode(sTitel));
+ dfQuiz.appendChild(eTitel);
+ // de Vragen
+ for (var i=0;i<nVragen;i++){
+  //DIV als container vr elke vraag
+  var oVraag = aVragen[i];
+  var eVraagContainer = document.createElement('div');
+  eVraagContainer.setAttribute("class","vraag");
+  eVraagContainer.setAttribute("data-index",i);
+  eVraagContainer.id = "vraag_" + i;
+  var eVraag = document.createElement('p');
+  var sVraag = document.createTextNode(oVraag.vraag);
+  eVraag.appendChild(sVraag);
+  eVraagContainer.appendChild(eVraag);
+  //eventueel images
+  if(oVraag.media){
+    var eImage = document.createElement('img'); 
+    eImage.src = "../images/" + oVraag.media;
+    eVraagContainer.appendChild(eImage); 
+  }
+  //Antwoorden
+ var eAntwoordenLijst = document.createElement('ul');
+ var aAntwoorden = oVraag.antwoorden;
+ var nAntwoorden = aAntwoorden.length;
+ var nCorrect = oVraag.correct; // getal die correct antwoord voorstelt
+ //lus doorheen alle antwoorden
+ for (var k=0;k<nAntwoorden;k++){
+  var eAntwoord = document.createElement('li');
+  var eLink = document.createElement('a');
+  eLink.setAttribute("href","#");
+  eLink.setAttribute("data-index",k);
+  var bCorrect = (k === nCorrect);
+  eLink.setAttribute("data-correct",bCorrect); 
+  eLink.addEventListener("click",function (e){evalVraag(e, this);});
+  eLink.appendChild(document.createTextNode(aAntwoorden[k]));
+  eAntwoord.appendChild(eLink);
+  eAntwoordenLijst.appendChild(eAntwoord);
+ }
+ eVraagContainer.appendChild(eAntwoordenLijst);
+  //Feedback
+  dfQuiz.appendChild(eVraagContainer); 
+ } //einde lus Vragen
+ return dfQuiz;
+
+};
+
+//function antwoord(link) evalueren
+function evalVraag(e,lienk){
+ //evalueert een quizvraag
+ //zoek de parent Vraagcontainer van de lienk
+ var eVraag = function(node){
+               while(node.parentNode){
+                 if(node.parentNode.className==='vraag'){
+                   return node.parentNode;
+                 }
+                 node=node.parentNode;
+                }
+              }(lienk);
+var nVraag = parseInt(eVraag.dataset["index"]);
+var nAntwoord = parseInt(lienk.dataset["index"]);
+var sCorrect = lienk.dataset["correct"];
+var bJuist = (sCorrect==="true");
+var sJuist = bJuist?"correct":"fout";
+ e.preventDefault();
+ console.log(link.dataset["correct"]);
+};
+
+</script>
 </head>
 <body>
 <h1>JS PF project: Quiz van de week</h1>

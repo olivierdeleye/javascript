@@ -93,23 +93,82 @@ ul.fouten li{
              return true;
           }
         }
-     }
+     },
+     aankomstL:{
+       msg: "aankomstluchthaven moet verschillen van vertrekluchthaven",
+       test: function(elem){
+       //custom test: aankomstluchthaven moet verschillen van vertrekluchthaven
+         if(elem.value !== ""){
+             var aL = elem.value; //aankomstluchthaven
+             var vL = document.frmVlucht.vertrekL.value; //vertrekluchthaven
+             return !(aL === vL);
+         }
+       }
+     },
+     retourDatum:{
+        msg: "retourdatum &gt; vertrekdatum",
+        test: function(elem){
+         /* custom test retourdatum minstens 1 dag na vertrekdatum
+          * 1dag later = 86400000 ms
+          * beide fomaten dd/mm/yyyy
+          */
+          if(elem.value !== ""){
+              var aD = elem.value; //aankomstdatum
+              var vD = document.frmVlucht.vertrekdatum.value; // vertrekdatum
+              var dag = 86400000; //dag in ms
+              //retourdatum
+              var arrD1 = aD.split('/');
+              var D1 = new Date(parseInt(arrD1[2]),parseInt(arrD1[1]-1),parseInt(arrD1[0]));
+              //vertrekdatum
+              var arrD2 = vD.split('/');
+              var D2 = new Date(parseInt(arrD2[2]),parseInt(arrD2[1]-1),parseInt(arrD2[0]));
+              var verschil = D1 - D2;
+              return (verschil >= dag);
+          }
+          else{
+              return true; // in geval van enkele reis en retourdatum disabled is
+          }
+        }
+     }        
  };
  
  window.onload = function (){
- //DOM referenties
- var eFrmVlucht = document.frmVlucht;
- var eRetour = document.frmVlucht.optRetour;
- var eEnkel = document.frmVlucht.optEnkel;
- var eVolw = document.frmVlucht.volwassenen;
- var eKind = document.frmVlucht.kinderen;
- var ePeut = document.frmVlucht.peuters;
  
+ console.log('login: ' + window.localStorage.getItem("username")+ "; "+
+       window.localStorage.getItem("password"));
+ //DOM referenties
+ var eFrmVlucht              = document.frmVlucht;
+ var eGebruikersnaam         = document.frmVlucht.username;
+ var ePaswoord               = document.frmVlucht.wachtwoord;
+ var eCheckbox               = document.frmVlucht.onthouLogin;
+ var eRetour                 = document.frmVlucht.optRetour;
+ var eEnkel                  = document.frmVlucht.optEnkel;
+ var eVolw                   = document.frmVlucht.volwassenen;
+ var eKind                   = document.frmVlucht.kinderen;
+ var ePeut                   = document.frmVlucht.peuters;
+ var eOnthouLogin            = document.frmVlucht.onthouLogin;
+ var eClearLoginKnop         = document.frmVlucht.clearLogin;
+ 
+ if(window.localStorage.getItem("username")!== null){
+   document.frmVlucht.username.value = window.localStorage.getItem("username");
+   document.frmVlucht.wachtwoord.value = window.localStorage.getItem("password");
+   eOnthouLogin.style.display = "none";
+ }
+ else{
+ eClearLoginKnop.disabled = "true";
+ eClearLoginKnop.style.display = "none";
+ }
+ 
+ eClearLoginKnop.addEventListener('click',function(e){wisLogin();
+                                           eGebruikersnaam.value = "";
+                                           ePaswoord.value = "";});
+
  //formulier submit
  eFrmVlucht.addEventListener('submit', function (e){
    e.preventDefault();
    var bValid = valideer(this);
    console.log('formulier ' + this.name +' valideert ' + bValid);
+   onthouLogin(eCheckbox, eGebruikersnaam, ePaswoord); //login onthouden indien gechecked
    if(bValid===true) this.submit();
  });
  
@@ -120,6 +179,9 @@ ul.fouten li{
  eEnkel.addEventListener('click', function(){ //radio enkel
                                    vluchtType(this.value);
                                  });
+ eVolw.addEventListener('blur',passagierNamen); //wanneer veld verlaten wordt, focus verdwijnt
+ eKind.addEventListener('blur',passagierNamen);
+ ePeut.addEventListener('blur',passagierNamen);
 };
 //================================= functions ==============================================
 
@@ -216,10 +278,63 @@ des-/activeert de retourdatum
   }
 };
  
+/* function passagiersNamen , controleer dynamisch het aantal passagiersnamen
+ * passagier blijft bestaan , er moet wel een SPAN element met #extras aanwezig zijn !
+ */
+function passagierNamen(){
+/*
+* controleert dynamisch het aantal passagiernamen
+* passagier 1 blijft steeds bestaan
+* veronderstelt de aanwezigheid van een SPAN#EXTRAS
+*/
+//aantallen velden
+ var eVolw = document.frmVlucht.volwassenen;
+ var eKind = document.frmVlucht.kinderen;
+ var ePeut = document.frmVlucht.peuters;
+ var eExtras = document.getElementById('extras');
+  if(!valideerVeld(eVolw)||!valideerVeld(eKind)||!valideerVeld(ePeut)){
+   return;
+  }
+ //getalwaarden
+ var nVolw = parseInt(eVolw.value); //ook required
+ var nKind = (eKind.value==="")?0:parseInt(eKind.value);
+ var nPeut = (ePeut.value==="")?0:parseInt(ePeut.value);
+ var nPassagiers = nVolw + nKind + nPeut;
+ var sInhoud = "";
+ for(var i=0;i<nPassagiers-1;i++){
+   sInhoud += maakPassagier(i+2);
+ }
+ eExtras.innerHTML = sInhoud;
 
+};
 
+//function maak passagier - stringopbouw van label en input element
+function maakPassagier(i){
+ /*
+ * maakt een label en een passagiernaamveld
+ *@i integer
+ *@return string HTML
+ */
+  var str = "";
+  str += "<label for=\"passagier"+i+"\">Passagier "+i+":</label>\n";
+  str += "<input type=\"text\" name=\"passagier"+i+"\" id=\"passagier"+i+"\" ";
+  str += "title=\"voornaam en famlilienaam van de passagier\" class=\"extra_p text required\" />\n";
+  str += "<br />\n";
+  return str;
+ };
+ 
+//function login bijhouden
+function onthouLogin(eCheckbox,eUsername,ePassword){
+    var bChecked = eCheckbox.value;
+    if(bChecked){
+        window.localStorage.setItem("username",eUsername.value);
+        window.localStorage.setItem("password",ePassword.value);
+    }
+};
 
-
+function wisLogin(){
+    window.localStorage.clear();
+};
 
 </script>
 </head>
@@ -238,6 +353,7 @@ des-/activeert de retourdatum
      <br />
     <label for="onthouLogin">Onthou login?</label>
     <input type="checkbox" name="onthouLogin" id="onthouLogin" title="Onthou login settings" />
+    <input type="button" name="clearLogin" value="Wis login" id="clearLogin" title="Wis login settings" />
   </fieldset>
   <fieldset id="vlucht">
     <legend>Uw Vlucht</legend>
@@ -379,10 +495,10 @@ des-/activeert de retourdatum
     </select>
     <br />
     <label  for="vertrekdatum">datum vertrek:</label>
-    <input type="text" name="vertrekdatum" id="vertrekdatum" size="10"  title="de vertrekdatum (dd/mm/yyyy)"  class="text datum required" />
+    <input type="text" name="vertrekdatum" id="vertrekdatum" size="10"  title="de vertrekdatum (dd/mm/yyyy)"  class="text datum required " />
     <br />
     <label for="aankomstL">naar:</label>
-    <select name="aankomstL" id="aankomstL" title="kies de luchthaven waar naartoe u vliegt" class="required">
+    <select name="aankomstL" id="aankomstL" title="kies de luchthaven waar naartoe u vliegt" class="required aankomstL">
       <option value="" selected="selected">Kies aankomst luchthaven</option>
       <option value="aAAR">Aarhus (AAR) </option>
       <option value="aABZ">Aberdeen (ABZ) </option>
@@ -514,7 +630,7 @@ des-/activeert de retourdatum
     </select>
     <br />
     <label for="retourdatum" id="labelRetourdatum">datum retour:</label>
-    <input type="text" name="retourdatum" id="retourdatum" size="10"  title="de datum van terugkeer (dd/mm/yyyy)" class="text datum required" />
+    <input type="text" name="retourdatum" id="retourdatum" size="10"  title="de datum van terugkeer (dd/mm/yyyy)" class="text datum required retourDatum" />
   </fieldset>
   <fieldset id="passagiers">
     <legend>Passagiers</legend>
